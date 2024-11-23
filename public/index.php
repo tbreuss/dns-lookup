@@ -1,6 +1,13 @@
-<?php require dirname(__DIR__) . '/vendor/autoload.php' ?>
+<?php
+ini_set('display_errors', false);
+ini_set('display_startup_errors', false);
+ini_set('log_errors', true);
+ini_set('error_log', dirname(__DIR__) . '/logs/errors.log');
+error_reporting(E_ALL);
+require dirname(__DIR__) . '/vendor/autoload.php';
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,17 +17,13 @@
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
-<body>
-<div class="container">
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <div class="container">
     <div class="header clearfix">
-        <h3 class="text-muted">Simple DNS Lookup</h3>
+        <h3 class="text-muted"><a href="./" class="text-dark text-decoration-none">Simple DNS Lookup</a></h3>
     </div>
-
     <?php
-    ini_set('display_errors', 1); // Uncomment to display errors
-    ini_set('display_startup_errors', 1); // Uncomment to display errors
-    error_reporting(E_ALL); // Uncomment to display errors
-
     // If domain is included in URL, prefill form with domain or if form is submitted display domain in it
     if (isset($_POST['domain'])) {
         $value = $_POST['domain'];
@@ -42,7 +45,7 @@
 
     // Page URL : check if "?domain=" is in the URL to adapt http_referer content
     if (isset($_SERVER['HTTP_REFERER'])) {
-        if ((strpos($_SERVER['HTTP_REFERER'], '?domain=') !== false)) {
+        if (str_contains($_SERVER['HTTP_REFERER'], '?domain=')) {
             $page_url_domain = $_SERVER['HTTP_REFERER'];
         } else {
             $page_url_domain = $_SERVER['HTTP_REFERER'] . "?domain=" . $value;
@@ -52,7 +55,7 @@
 
     <div class="jumbotron">
         <form action="./" method="post">
-            <div class="form-group">
+            <div class="input-group">
                 <input
                         type="search"
                         class="form-control input-lg text-center"
@@ -69,7 +72,7 @@
 
     <?php if (isset($_POST['submit'])):  ?>
 
-        <div class="row marketing">
+        <div class="marketing">
             <table class="table table-striped table-bordered table-responsive">
                 <thead class="bg-primary">
                 <tr>
@@ -79,7 +82,7 @@
                 </tr>
                 </thead>
                 <!-- A RECORD -->
-                <?php if (empty($ipV4Records = tebe\dnsLookup\fetchIpV4Records($domain))): ?>
+                <?php if (empty($ipV4Records = tebe\dnsLookup\fetchARecords($domain))): ?>
                     <tr>
                         <td class="align-middle text-center"><h4><span class="badge text-bg-primary">A</span></h4></td>
                         <td class="align-middle text-center">NA</td>
@@ -92,10 +95,7 @@
                             <td class="align-middle text-center"><?= $ipV4Record->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                $ipapi = file_get_contents(
-                                    'http://ip-api.com/json/' . $ipV4Record->ipv4 . '?fields=4195842'
-                                ); // https://ip-api.com/docs/api:json#test
-                                $ipapidc = json_decode($ipapi, true);
+                                $ipapidc = tebe\dnsLookup\locateIp($ipV4Record->ipv4, 4195842);
                                 $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
                                     '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -107,7 +107,7 @@
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo(" " . $ipapidc['countryCode'] . " · " . $ipV4Record->ipv4 . " · <small>(<b>ISP</b> " . $ipapidc['isp'] . " <b>ORG</b> " . $ipapidc['org'] . " <b>AS</b> " . $ipapidc['asname']);
+                                echo " " . $ipapidc['countryCode'] . " · " . $ipV4Record->ipv4 . " · <small>(<b>ISP</b> " . $ipapidc['isp'] . " <b>ORG</b> " . $ipapidc['org'] . " <b>AS</b> " . $ipapidc['asname'];
                                 echo ")</small>";
                                 ?>
                             </td>
@@ -116,7 +116,7 @@
                 <?php endif ?>
 
                 <!-- AAAA RECORD -->
-                <?php if (empty($ipV6Records = tebe\dnsLookup\fetchIpV6Records($domain))): ?>
+                <?php if (empty($ipV6Records = tebe\dnsLookup\fetchAaaaRecords($domain))): ?>
                     <tr>
                         <td class="align-middle text-center"><h4><span class="badge text-bg-info">AAAA</span></h4></td>
                         <td class="align-middle text-center">NA</td>
@@ -129,10 +129,7 @@
                             <td class="align-middle text-center"><?= $ipV6Record->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                $ipapi = file_get_contents(
-                                    'http://ip-api.com/json/' . $ipV6Record->ipv6 . '?fields=4195842'
-                                );
-                                $ipapidc = json_decode($ipapi, true);
+                                $ipapidc = tebe\dnsLookup\locateIp($ipV6Record->ipv6, 4195842);
                                 $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
                                     '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -144,7 +141,7 @@
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo(" " . $ipapidc['countryCode'] . " · " . $ipV6Record->ipv6 . " ·<small> <b>ISP</b> " . $ipapidc['isp'] . " · <b>ORG</b> " . $ipapidc['org'] . " · <b>ASNAME</b> " . $ipapidc['asname']);
+                                echo " " . $ipapidc['countryCode'] . " · " . $ipV6Record->ipv6 . " ·<small> <b>ISP</b> " . $ipapidc['isp'] . " · <b>ORG</b> " . $ipapidc['org'] . " · <b>ASNAME</b> " . $ipapidc['asname'];
                                 echo "</small>";
                                 ?>
                             </td>
@@ -166,12 +163,9 @@
                             <td class="align-middle text-center"><?= $nsRecord->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                echo($nsRecord->target);
+                                echo $nsRecord->target;
                                 echo " (";
-                                $ipapi = file_get_contents(
-                                    'http://ip-api.com/json/' . gethostbyname($nsRecord->target) . '?fields=2'
-                                );
-                                $ipapidc = json_decode($ipapi, true);
+                                $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($nsRecord->target), 2);
                                 $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
                                     '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -183,7 +177,7 @@
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo(" " . $ipapidc['countryCode'] . " · " . gethostbyname($nsRecord->target));
+                                echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($nsRecord->target);
                                 echo ")";
                                 ?>
                             </td>
@@ -207,10 +201,7 @@
                                 <?php
                                 echo $ptrRecord->target;
                                 echo " (";
-                                $ipapi = file_get_contents(
-                                    'http://ip-api.com/json/' . gethostbyname($ptrRecord->target) . '?fields=2'
-                                );
-                                $ipapidc = json_decode($ipapi, true);
+                                $ipapidc = tebe\dnsLookup\locateIp($ipV6Record->ipv6, 2);
                                 $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
                                     '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -222,7 +213,7 @@
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo(" " . $ipapidc['countryCode'] . " · " . gethostbyname($ptrRecord->target));
+                                echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($ptrRecord->target);
                                 echo ")";
                                 ?>
                             </td>
@@ -244,11 +235,8 @@
                             <td class="align-middle text-center"><?= $mxRecord->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                    echo("[" . $mxRecord->pri . "] " . $mxRecord->target . " (");
-                                    $ipapi = file_get_contents(
-                                        'http://ip-api.com/json/' . gethostbyname($mxRecord->target) . '?fields=2'
-                                    );
-                                    $ipapidc = json_decode($ipapi, true);
+                                    echo "[" . $mxRecord->pri . "] " . $mxRecord->target . " (";
+                                    $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($mxRecord->target), 2);
                                     $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                     echo mb_convert_encoding(
                                         '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -260,7 +248,7 @@
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
-                                    echo(" " . $ipapidc['countryCode'] . " · " . gethostbyname($mxRecord->target));
+                                    echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($mxRecord->target);
                                     echo ")";
                                 ?>
                             </td>
@@ -284,10 +272,7 @@
                                 <?php
                                     echo $cnameRecord->target;
                                     echo " (";
-                                    $ipapi = file_get_contents(
-                                        'http://ip-api.com/json/' . gethostbyname($cnameRecord->target) . '?fields=2'
-                                    );
-                                    $ipapidc = json_decode($ipapi, true);
+                                    $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($cnameRecord->target), 2);
                                     $country_code_flag = $ipapidc['countryCode']; // Uppercase
                                     echo mb_convert_encoding(
                                         '&#' . (127397 + ord($country_code_flag[0])) . ';',
@@ -299,7 +284,7 @@
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
-                                    echo(" " . $ipapidc['countryCode'] . " · " . gethostbyname($cnameRecord->target));
+                                    echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($cnameRecord->target);
                                     echo ")";
                                 ?>
                             </td>
@@ -351,11 +336,10 @@
             <p>Direct link : <a href="<?= $page_url_domain ?>"><?= $page_url_domain ?></a></p>
         </div>
     <?php endif ?><!-- ENDIF FORM SUBMITTED -->
-
-    <footer class="footer">
-        <p class="text-center">&copy; Simple DNS Lookup -
-            <a href="https://github.com/tbreuss/dns-Lookup">Sourcecode on GitHub</a></p>
-    </footer>
 </div>
+</main>
+<footer class="footer mt-auto">
+    <div class="text-center">&copy; Simple DNS Lookup - <a href="https://github.com/tbreuss/simple-dns-Lookup">Sourcecode on GitHub</a></div>
+</footer>
 </body>
 </html>

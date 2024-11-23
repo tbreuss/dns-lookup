@@ -2,9 +2,9 @@
 
 namespace tebe\dnsLookup;
 
-use tebe\dnsLookup\data\CnameRecord;
-use tebe\dnsLookup\data\ARecord;
 use tebe\dnsLookup\data\AaaaRecord;
+use tebe\dnsLookup\data\ARecord;
+use tebe\dnsLookup\data\CnameRecord;
 use tebe\dnsLookup\data\MxRecord;
 use tebe\dnsLookup\data\NsRecord;
 use tebe\dnsLookup\data\PtrRecord;
@@ -22,7 +22,7 @@ function createCnameRecord(array $record): CnameRecord
     );
 }
 
-function createIpV4Record(array $record): ARecord
+function createARecord(array $record): ARecord
 {
     return new ARecord(
         $record['host'],
@@ -33,7 +33,7 @@ function createIpV4Record(array $record): ARecord
     );
 }
 
-function createIpV6Record(array $record): AaaaRecord
+function createAaaaRecord(array $record): AaaaRecord
 {
     return new AaaaRecord(
         $record['host'],
@@ -124,12 +124,12 @@ function fetchCnameRecords(string $domain): array
 /**
  * @return ARecord[]
  */
-function fetchIpV4Records(string $domain): array
+function fetchARecords(string $domain): array
 {
     $records = [];
 
     foreach (fetchDnsRecord($domain, DNS_A) as $record) {
-        $records[] = createIpV4Record($record);
+        $records[] = createARecord($record);
     }
 
     return $records;
@@ -138,12 +138,12 @@ function fetchIpV4Records(string $domain): array
 /**
  * @return AaaaRecord[]
  */
-function fetchIpV6Records(string $domain): array
+function fetchAaaaRecords(string $domain): array
 {
     $records = [];
 
     foreach (fetchDnsRecord($domain, DNS_AAAA) as $record) {
-        $records[] = createIpV6Record($record);
+        $records[] = createAaaaRecord($record);
     }
 
     return $records;
@@ -245,9 +245,9 @@ function fetchDnsRecords(string $domain): array
     ];
 
     foreach (dns_get_record($domain, DNS_A + DNS_AAAA + DNS_CNAME + DNS_MX + DNS_NS + DNS_SOA + DNS_TXT) as $record) {
-        $records[$record['type']][] = match($record['type']) {
-            'A' => createIpV4Record($record),
-            'AAAA' => createIpV6Record($record),
+        $records[$record['type']][] = match ($record['type']) {
+            'A' => createARecord($record),
+            'AAAA' => createAaaaRecord($record),
             'CNAME' => createCnameRecord($record),
             'MX' => createMxRecord($record),
             'NS' => createNsRecord($record),
@@ -259,4 +259,13 @@ function fetchDnsRecords(string $domain): array
     }
 
     return $records;
+}
+
+function locateIp(string $ip, int $fields): array
+{
+    $response = file_get_contents(
+        'http://ip-api.com/json/' . $ip . '?fields=' . $fields
+    );
+
+    return json_decode($response, true);
 }
