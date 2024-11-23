@@ -73,7 +73,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     <?php if (isset($_POST['submit'])):  ?>
 
         <div class="marketing">
-            <table class="table table-striped table-bordered table-responsive">
+            <table class="table table-striped table-bordered">
                 <thead class="bg-primary">
                 <tr>
                     <th class="text-center">Record</th>
@@ -328,7 +328,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-secondary">TXT</span></h4></td>
                             <td class="align-middle text-center"><?= $txtRecord->ttl ?></td>
-                            <td class="align-middle bg-success-subtle"><?= wordwrap($txtRecord->txt, 80, "<br/>\n", true) ?></td>
+                            <td class="align-middle bg-success-subtle text-break"><?= $txtRecord->txt ?></td>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
@@ -339,7 +339,10 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 </div>
 </main>
 <footer class="footer mt-auto">
-    <div class="text-center">&copy; Simple DNS Lookup - <a href="https://github.com/tbreuss/simple-dns-Lookup">Sourcecode on GitHub</a></div>
+    <div class="container d-flex justify-content-between">
+        <div class="text-start">A tiny <a href="https://tebe.ch/" target="_blank">tebe.ch</a> project</div>
+        <div class="text-end">&copy; Simple DNS Lookup - <a href="https://github.com/tbreuss/simple-dns-Lookup" target="_blank">Sourcecode on GitHub</a></div>
+    </div>
 </footer>
 </body>
 </html>
