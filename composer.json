@@ -1,12 +1,5 @@
 {
-    "name": "thomas/dns-lookup",
-    "authors": [
-        {
-            "name": "tbreuss",
-            "email": "thomasbreuss@gmx.ch"
-        }
-    ],
-    "require": {},
+    "name": "tbreuss/dns-lookup",
     "autoload": {
         "psr-4": {
             "tebe\\dnsLookup\\": "./src"
