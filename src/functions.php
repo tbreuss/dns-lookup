@@ -269,3 +269,10 @@ function locateIp(string $ip, int $fields): array
 
     return json_decode($response, true);
 }
+
+function validateHostname(string $domain): bool
+{
+    $status = filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
+
+    return !($status === false);
+}

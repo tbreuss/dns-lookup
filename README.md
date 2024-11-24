@@ -1,9 +1,7 @@
-# Simple-DNS-Lookup
+# Simple DNS Lookup
 
-Simple PHP script to lookup entries of A, AAAA, NS, MX, CNAME, SOA and TXT records.
+Simple PHP script for looking up entries in A, AAAA, NS, MX, CNAME, SOA and TXT entries, created with PHP 8.3 and Bootstrap 5.
 
-You can test the tool here : https://outils.hqweb.com/dns-lookup/
+You can test the tool here: https://simple-dns-lookup.tebe.ch/
 
-Built with Bootstrap.
-
-![Simple DNS Lookup](https://outils.hqweb.com/dns-lookup/assets/preview.png)
+![Simple DNS Lookup](public/assets/preview.png)

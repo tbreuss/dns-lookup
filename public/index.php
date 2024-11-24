@@ -71,8 +71,8 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     </div>
 
     <?php if (isset($_POST['submit'])):  ?>
-
-        <div class="marketing">
+        <?php if (tebe\dnsLookup\validateHostname($domain)): ?>
+            <div class="marketing">
             <table class="table table-striped table-bordered">
                 <thead class="bg-primary">
                 <tr>
@@ -335,6 +335,11 @@ require dirname(__DIR__) . '/vendor/autoload.php';
             </table>
             <p>Direct link : <a href="<?= $page_url_domain ?>"><?= $page_url_domain ?></a></p>
         </div>
+        <?php else: ?>
+            <div class="marketing alert alert-danger">
+                The given domain "<?= $domain ?>" is invalid.
+            </div>
+        <?php endif ?>
     <?php endif ?><!-- ENDIF FORM SUBMITTED -->
 </div>
 </main>
