@@ -34,42 +34,40 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     }
 
     // Parse url to extract host
-    $posted_domain = $_POST['domain'] ?? '';
-    $parsed_url = parse_url($posted_domain);
+    $postedDomain = $_POST['domain'] ?? '';
+    $parsedUrl = parse_url($postedDomain);
 
-    if (array_key_exists('host', $parsed_url)) {
-        $domain = $parsed_url['host'];
+    if (array_key_exists('host', $parsedUrl)) {
+        $domain = $parsedUrl['host'];
     } else {
-        $domain = $posted_domain;
+        $domain = $postedDomain;
     }
 
     // Page URL : check if "?domain=" is in the URL to adapt http_referer content
     if (isset($_SERVER['HTTP_REFERER'])) {
         if (str_contains($_SERVER['HTTP_REFERER'], '?domain=')) {
-            $page_url_domain = $_SERVER['HTTP_REFERER'];
+            $pageUrlDomain = $_SERVER['HTTP_REFERER'];
         } else {
-            $page_url_domain = $_SERVER['HTTP_REFERER'] . "?domain=" . $value;
+            $pageUrlDomain = $_SERVER['HTTP_REFERER'] . "?domain=" . $value;
         }
     }
     ?>
-
     <div class="jumbotron">
         <form action="./" method="post">
             <div class="input-group">
                 <input
-                        type="search"
-                        class="form-control input-lg text-center"
-                        name="domain"
-                        id="domain"
-                        placeholder="https://www.domain.com/page.html or domain.com"
-                        value="<?= $value ?>"
-                        required
+                    type="search"
+                    class="form-control input-lg text-center"
+                    name="domain"
+                    id="domain"
+                    placeholder="https://www.domain.com/page.html or domain.com"
+                    value="<?= $value ?>"
+                    required
                 >
                 <button type="submit" name="submit" class="btn btn-primary btn-lg">Lookup</button>
             </div>
         </form>
     </div>
-
     <?php if (isset($_POST['submit'])):  ?>
         <?php if (tebe\dnsLookup\validateHostname($domain)): ?>
             <div class="marketing">
@@ -95,26 +93,25 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                             <td class="align-middle text-center"><?= $ipV4Record->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                $ipapidc = tebe\dnsLookup\locateIp($ipV4Record->ipv4, 4195842);
-                                $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                $locatedIp = tebe\dnsLookup\locateIp($ipV4Record->ipv4, 4195842);
+                                $countryFlag = $locatedIp['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[0])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[1])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo " " . $ipapidc['countryCode'] . " · " . $ipV4Record->ipv4 . " · <small>(<b>ISP</b> " . $ipapidc['isp'] . " <b>ORG</b> " . $ipapidc['org'] . " <b>AS</b> " . $ipapidc['asname'];
+                                echo " " . $locatedIp['countryCode'] . " · " . $ipV4Record->ipv4 . " · <small>(<b>ISP</b> " . $locatedIp['isp'] . " <b>ORG</b> " . $locatedIp['org'] . " <b>AS</b> " . $locatedIp['asname'];
                                 echo ")</small>";
                                 ?>
                             </td>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- AAAA RECORD -->
                 <?php if (empty($ipV6Records = tebe\dnsLookup\fetchAaaaRecords($domain))): ?>
                     <tr>
@@ -129,26 +126,25 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                             <td class="align-middle text-center"><?= $ipV6Record->ttl ?></td>
                             <td class="align-middle bg-success-subtle">
                                 <?php
-                                $ipapidc = tebe\dnsLookup\locateIp($ipV6Record->ipv6, 4195842);
-                                $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                $locatedIp = tebe\dnsLookup\locateIp($ipV6Record->ipv6, 4195842);
+                                $countryFlag = $locatedIp['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[0])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[1])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo " " . $ipapidc['countryCode'] . " · " . $ipV6Record->ipv6 . " ·<small> <b>ISP</b> " . $ipapidc['isp'] . " · <b>ORG</b> " . $ipapidc['org'] . " · <b>ASNAME</b> " . $ipapidc['asname'];
+                                echo " " . $locatedIp['countryCode'] . " · " . $ipV6Record->ipv6 . " ·<small> <b>ISP</b> " . $locatedIp['isp'] . " · <b>ORG</b> " . $locatedIp['org'] . " · <b>ASNAME</b> " . $locatedIp['asname'];
                                 echo "</small>";
                                 ?>
                             </td>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- NS RECORD -->
                 <?php if (empty($nsRecords = tebe\dnsLookup\fetchNsRecords($domain))): ?>
                     <tr>
@@ -165,26 +161,25 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                                 <?php
                                 echo $nsRecord->target;
                                 echo " (";
-                                $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($nsRecord->target), 2);
-                                $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                $locatedIp = tebe\dnsLookup\locateIp(gethostbyname($nsRecord->target), 2);
+                                $countryFlag = $locatedIp['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[0])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[1])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
-                                echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($nsRecord->target);
+                                echo " " . $locatedIp['countryCode'] . " · " . gethostbyname($nsRecord->target);
                                 echo ")";
                                 ?>
                             </td>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- PTR RECORD -->
                 <?php /*if (empty($ptrRecords = tebe\dnsLookup\fetchPtrRecords($domain))): ?>
                     <tr>
@@ -202,14 +197,14 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                                 echo $ptrRecord->target;
                                 echo " (";
                                 $ipapidc = tebe\dnsLookup\locateIp($ipV6Record->ipv6, 2);
-                                $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                $countryFlag = $ipapidc['countryCode']; // Uppercase
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[0])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
                                 echo mb_convert_encoding(
-                                    '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                    '&#' . (127397 + ord($countryFlag[1])) . ';',
                                     'UTF-8',
                                     'HTML-ENTITIES'
                                 );
@@ -220,7 +215,6 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         </tr>
                     <?php endforeach ?>
                 <?php endif */ ?>
-
                 <!-- MX RECORD -->
                 <?php if (empty($mxRecords = tebe\dnsLookup\fetchMxRecords($domain))): ?>
                     <tr>
@@ -236,26 +230,25 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                             <td class="align-middle bg-success-subtle">
                                 <?php
                                     echo "[" . $mxRecord->pri . "] " . $mxRecord->target . " (";
-                                    $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($mxRecord->target), 2);
-                                    $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                    $locatedIp = tebe\dnsLookup\locateIp(gethostbyname($mxRecord->target), 2);
+                                    $countryFlag = $locatedIp['countryCode']; // Uppercase
                                     echo mb_convert_encoding(
-                                        '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                        '&#' . (127397 + ord($countryFlag[0])) . ';',
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
                                     echo mb_convert_encoding(
-                                        '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                        '&#' . (127397 + ord($countryFlag[1])) . ';',
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
-                                    echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($mxRecord->target);
+                                    echo " " . $locatedIp['countryCode'] . " · " . gethostbyname($mxRecord->target);
                                     echo ")";
                                 ?>
                             </td>
-                    </tr>
+                        </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- CNAME RECORD -->
                 <?php if (empty($cnameRecords = tebe\dnsLookup\fetchCnameRecords($domain))): ?>
                     <tr>
@@ -272,26 +265,25 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                                 <?php
                                     echo $cnameRecord->target;
                                     echo " (";
-                                    $ipapidc = tebe\dnsLookup\locateIp(gethostbyname($cnameRecord->target), 2);
-                                    $country_code_flag = $ipapidc['countryCode']; // Uppercase
+                                    $locatedIp = tebe\dnsLookup\locateIp(gethostbyname($cnameRecord->target), 2);
+                                    $countryFlag = $locatedIp['countryCode']; // Uppercase
                                     echo mb_convert_encoding(
-                                        '&#' . (127397 + ord($country_code_flag[0])) . ';',
+                                        '&#' . (127397 + ord($countryFlag[0])) . ';',
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
                                     echo mb_convert_encoding(
-                                        '&#' . (127397 + ord($country_code_flag[1])) . ';',
+                                        '&#' . (127397 + ord($countryFlag[1])) . ';',
                                         'UTF-8',
                                         'HTML-ENTITIES'
                                     );
-                                    echo " " . $ipapidc['countryCode'] . " · " . gethostbyname($cnameRecord->target);
+                                    echo " " . $locatedIp['countryCode'] . " · " . gethostbyname($cnameRecord->target);
                                     echo ")";
                                 ?>
                             </td>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- SOA RECORD -->
                 <?php if (empty($soaRecords = tebe\dnsLookup\fetchSoaRecords($domain))): ?>
                     <tr>
@@ -315,7 +307,6 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
-
                 <!-- TXT RECORD -->
                 <?php if (empty($txtRecords = tebe\dnsLookup\fetchTxtRecords($domain))): ?>
                     <tr>
@@ -333,14 +324,14 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                     <?php endforeach ?>
                 <?php endif ?>
             </table>
-            <p>Direct link : <a href="<?= $page_url_domain ?>"><?= $page_url_domain ?></a></p>
+            <p>Direct link : <a href="<?= $pageUrlDomain ?>"><?= $pageUrlDomain ?></a></p>
         </div>
         <?php else: ?>
             <div class="marketing alert alert-danger">
                 The given domain "<?= $domain ?>" is invalid.
             </div>
         <?php endif ?>
-    <?php endif ?><!-- ENDIF FORM SUBMITTED -->
+    <?php endif ?>
 </div>
 </main>
 <footer class="footer mt-auto">
