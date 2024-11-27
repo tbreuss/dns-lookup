@@ -276,3 +276,18 @@ function validateHostname(string $domain): bool
 
     return !($status === false);
 }
+
+function countryFlag(string $countryFlag): string
+{
+    return 
+        mb_convert_encoding(
+            '&#' . (127397 + ord($countryFlag[0])) . ';',
+            'UTF-8',
+            'HTML-ENTITIES'
+        ) .
+        mb_convert_encoding(
+            '&#' . (127397 + ord($countryFlag[1])) . ';',
+            'UTF-8',
+            'HTML-ENTITIES'
+        );
+}
