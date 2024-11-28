@@ -93,14 +93,20 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-primary">A</span></h4></td>
                             <td class="align-middle text-center"><?= $ipV4Record->ttl ?></td>
-                            <td class="align-middle bg-success-subtle">
-                                <?= $ipV4Record->ipv4 ?> 
-                                (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?> 
-                                <?= $locatedIp['countryCode'] ?> ·
-                                <b>ISP</b> <?= $locatedIp['isp'] ?> · 
-                                <b>ORG</b> <?= $locatedIp['org'] ?> · 
-                                <b>AS</b> <?= $locatedIp['asname'] ?>)
-                            </td>
+                            <?php if ($locatedIp): ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $ipV4Record->ipv4 ?> 
+                                    (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?> 
+                                    <?= $locatedIp['countryCode'] ?> ·
+                                    <b>ISP</b> <?= $locatedIp['isp'] ?> · 
+                                    <b>ORG</b> <?= $locatedIp['org'] ?> · 
+                                    <b>AS</b> <?= $locatedIp['asname'] ?>)
+                                </td>
+                            <?php else: ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $ipV4Record->ipv4 ?> 
+                                </td>                                
+                            <?php endif ?>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
@@ -117,14 +123,20 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-info">AAAA</span></h4></td>
                             <td class="align-middle text-center"><?= $ipV6Record->ttl ?></td>
-                            <td class="align-middle bg-success-subtle">
-                                <?= $ipV6Record->ipv6 ?>
-                                (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
-                                <?= $locatedIp['countryCode'] ?> ·
-                                <b>ISP</b> <?= $locatedIp['isp'] ?> ·
-                                <b>ORG</b> <?= $locatedIp['org'] ?> ·
-                                <b>ASNAME</b> <?= $locatedIp['asname'] ?>)
-                            </td>
+                            <?php if ($locatedIp): ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $ipV6Record->ipv6 ?>
+                                    (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
+                                    <?= $locatedIp['countryCode'] ?> ·
+                                    <b>ISP</b> <?= $locatedIp['isp'] ?> ·
+                                    <b>ORG</b> <?= $locatedIp['org'] ?> ·
+                                    <b>ASNAME</b> <?= $locatedIp['asname'] ?>)
+                                </td>
+                            <?php else: ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $ipV6Record->ipv6 ?>
+                                </td>
+                            <?php endif ?>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
@@ -141,12 +153,19 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-success">NS</span></h4></td>
                             <td class="align-middle text-center"><?= $nsRecord->ttl ?></td>
-                            <td class="align-middle bg-success-subtle">
-                                <?= $nsRecord->target ?>
-                                (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
-                                <?= $locatedIp['countryCode'] ?> · 
-                                <?= gethostbyname($nsRecord->target) ?>)
-                            </td>
+                            <?php if ($locatedIp): ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $nsRecord->target ?>
+                                    (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
+                                    <?= $locatedIp['countryCode'] ?> · 
+                                    <?= gethostbyname($nsRecord->target) ?>)
+                                </td>
+                            <?php else: ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $nsRecord->target ?>
+                                    (<?= gethostbyname($nsRecord->target) ?>)
+                                </td>                                
+                            <?php endif ?>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
@@ -185,12 +204,19 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-danger">MX</span></h4></td>
                             <td class="align-middle text-center"><?= $mxRecord->ttl ?></td>
-                            <td class="align-middle bg-success-subtle">
-                                [<?= $mxRecord->pri ?>] <?= $mxRecord->target ?>
-                                (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
-                                <?= $locatedIp['countryCode'] ?> ·
-                                <?= gethostbyname($mxRecord->target) ?>)
-                            </td>
+                            <?php if ($locatedIp): ?>
+                                <td class="align-middle bg-success-subtle">
+                                    [<?= $mxRecord->pri ?>] <?= $mxRecord->target ?>
+                                    (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
+                                    <?= $locatedIp['countryCode'] ?> ·
+                                    <?= gethostbyname($mxRecord->target) ?>)
+                                </td>
+                            <?php else: ?>
+                                <td class="align-middle bg-success-subtle">
+                                    [<?= $mxRecord->pri ?>] <?= $mxRecord->target ?>
+                                    (<?= gethostbyname($mxRecord->target) ?>)
+                                </td>
+                            <?php endif ?>    
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>
@@ -207,12 +233,19 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                         <tr>
                             <td class="align-middle text-center"><h4><span class="badge text-bg-secondary">CNAME</span></h4></td>
                             <td class="align-middle text-center"><?= $cnameRecord->ttl ?></td>
-                            <td class="align-middle bg-success-subtle">
-                                <?= $cnameRecord->target ?>
-                                (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
-                                <?= $locatedIp['countryCode'] ?> ·
-                                <?= gethostbyname($cnameRecord->target) ?>)
-                            </td>
+                            <?php if ($locatedIp): ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $cnameRecord->target ?>
+                                    (<?= tebe\dnsLookup\countryFlag($locatedIp['countryCode']) ?>
+                                    <?= $locatedIp['countryCode'] ?> ·
+                                    <?= gethostbyname($cnameRecord->target) ?>)
+                                </td>
+                            <?php else: ?>
+                                <td class="align-middle bg-success-subtle">
+                                    <?= $cnameRecord->target ?>
+                                    (<?= gethostbyname($cnameRecord->target) ?>)
+                                </td>
+                            <?php endif ?>
                         </tr>
                     <?php endforeach ?>
                 <?php endif ?>

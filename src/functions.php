@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace tebe\dnsLookup;
 
+use Exception;
 use tebe\dnsLookup\data\AaaaRecord;
 use tebe\dnsLookup\data\ARecord;
 use tebe\dnsLookup\data\CnameRecord;
@@ -261,13 +262,27 @@ function fetchDnsRecords(string $domain): array
     return $records;
 }
 
-function locateIp(string $ip, int $fields): array
+function locateIp(string $ip, int $fields): ?array
 {
     $response = file_get_contents(
         'http://ip-api.com/json/' . $ip . '?fields=' . $fields
     );
 
-    return json_decode($response, true);
+    if ($response === false) {
+        return null;
+    }
+
+    try {
+        $decoded = json_decode($response, true);
+
+        if (!is_array($decoded) || count($decoded) === 0) {
+            return null;
+        }
+
+        return $decoded;
+    } catch (Exception $e) {
+        return null;
+    }
 }
 
 function validateHostname(string $domain): bool
@@ -277,8 +292,12 @@ function validateHostname(string $domain): bool
     return !($status === false);
 }
 
-function countryFlag(string $countryFlag): string
+function countryFlag(?string $countryFlag): string
 {
+    if ($countryFlag === null || $countryFlag === '') {
+        return '';
+    }
+
     return 
         mb_convert_encoding(
             '&#' . (127397 + ord($countryFlag[0])) . ';',

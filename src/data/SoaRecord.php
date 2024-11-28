@@ -11,10 +11,10 @@ final readonly class SoaRecord extends BasicDnsRecord
         public int $ttl,
         public string $mname,
         public string $rname,
-        public string $serial,
-        public string $refresh,
-        public string $retry,
-        public string $expire,
-        public string $minimumTtl,
+        public int $serial,
+        public int $refresh,
+        public int $retry,
+        public int $expire,
+        public int $minimumTtl,
     ) {}
 }
