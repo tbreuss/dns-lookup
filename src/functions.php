@@ -310,3 +310,44 @@ function countryFlag(?string $countryFlag): string
             'HTML-ENTITIES'
         );
 }
+
+function getUserInput(): string
+{
+    $userInput = '';
+
+    if (isset($_POST['domain'])) {
+        $userInput = $_POST['domain'];
+    } elseif(isset($_GET['domain'])) {
+        $userInput = $_GET['domain'];
+    }
+
+    return $userInput;
+}
+
+function extractDomainFromUserInput(string $userInput): string
+{
+    $parsedUrl = parse_url($userInput);
+
+    if (array_key_exists('host', $parsedUrl)) {
+        $domain = $parsedUrl['host'];
+    } else {
+        $domain = $userInput;
+    }
+
+    return $domain;
+}
+
+function createDirectLink(string $domain): string
+{
+    $directLink = '';
+
+    if (isset($_SERVER['HTTP_REFERER'])) {
+        if (str_contains($_SERVER['HTTP_REFERER'], '?domain=')) {
+            $directLink = $_SERVER['HTTP_REFERER'];
+        } else {
+            $directLink = $_SERVER['HTTP_REFERER'] . "?domain=" . $domain;
+        }
+    }
+
+    return $directLink;
+}

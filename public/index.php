@@ -4,7 +4,12 @@ ini_set('display_startup_errors', false);
 ini_set('log_errors', true);
 ini_set('error_log', dirname(__DIR__) . '/logs/errors.log');
 error_reporting(E_ALL);
+
 require dirname(__DIR__) . '/vendor/autoload.php';
+
+$userInput = tebe\dnsLookup\getUserInput();
+$domain = tebe\dnsLookup\extractDomainFromUserInput($userInput);
+$directLink = tebe\dnsLookup\createDirectLink($userInput);
 ?>
 <!DOCTYPE html>
 <html lang="en" class="h-100">
@@ -23,35 +28,6 @@ require dirname(__DIR__) . '/vendor/autoload.php';
     <div class="header clearfix">
         <h3 class="text-muted"><a href="./" class="text-dark text-decoration-none">Simple DNS Lookup</a></h3>
     </div>
-    <?php
-    // If domain is included in URL, prefill form with domain or if form is submitted display domain in it
-    if (isset($_POST['domain'])) {
-        $value = $_POST['domain'];
-    } elseif(isset($_GET['domain'])) {
-        $value = $_GET['domain'];
-    } else {
-        $value = '';
-    }
-
-    // Parse url to extract host
-    $postedDomain = $_POST['domain'] ?? '';
-    $parsedUrl = parse_url($postedDomain);
-
-    if (array_key_exists('host', $parsedUrl)) {
-        $domain = $parsedUrl['host'];
-    } else {
-        $domain = $postedDomain;
-    }
-
-    // Page URL: check if "?domain=" is in the URL to adapt http_referer content
-    if (isset($_SERVER['HTTP_REFERER'])) {
-        if (str_contains($_SERVER['HTTP_REFERER'], '?domain=')) {
-            $pageUrlDomain = $_SERVER['HTTP_REFERER'];
-        } else {
-            $pageUrlDomain = $_SERVER['HTTP_REFERER'] . "?domain=" . $value;
-        }
-    }
-    ?>
     <div class="jumbotron">
         <form action="./" method="post">
             <div class="input-group">
@@ -61,7 +37,7 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                     name="domain"
                     id="domain"
                     placeholder="https://www.domain.com/page.html or domain.com"
-                    value="<?= $value ?>"
+                    value="<?= $userInput ?>"
                     required
                     autofocus
                 >
@@ -290,7 +266,9 @@ require dirname(__DIR__) . '/vendor/autoload.php';
                     <?php endforeach ?>
                 <?php endif ?>
             </table>
-            <p>Direct link: <a href="<?= $pageUrlDomain ?>"><?= $pageUrlDomain ?></a></p>
+            <?php if ($directLink <> ''): ?>
+                <p>Direct link: <a href="<?= $directLink ?>"><?= $directLink ?></a></p>
+            <?php endif ?>
         </div>
         <?php else: ?>
             <div class="marketing alert alert-danger">
